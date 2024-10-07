@@ -19,12 +19,8 @@ from transformers.trainer_utils import set_seed
 DEFAULT_CKPT_PATH = "/root/autodl-tmp/MUST-Helper"
 
 _WELCOME_MSG = """\
-Welcome to use Qwen2.5-Instruct model, type text to start chat, type :h to show command help.
-(欢迎使用 Qwen2.5-Instruct 模型，输入内容即可进行对话，:h 显示命令帮助。)
-
-Note: This demo is governed by the original license of Qwen2.5.
-We strongly advise users not to knowingly generate or allow others to knowingly generate harmful content, including hate speech, violence, pornography, deception, etc.
-(注：本演示受Qwen2.5的许可协议限制。我们强烈建议，用户不应传播及不应允许他人传播以下内容，包括但不限于仇恨言论、暴力、色情、欺诈相关的有害信息。)
+Welcome to use MUST-Helper model, type text to start chat, type :h to show command help.
+(欢迎使用 MUST-Helper 模型，输入内容即可进行对话，:h 显示命令帮助，:q 退出命令行释放GPU。)
 """
 _HELP_MSG = """\
 Commands:
@@ -94,6 +90,8 @@ def _load_model_tokenizer(args):
     model = AutoModelForCausalLM.from_pretrained(
         args.checkpoint_path,
         torch_dtype="auto",
+        # torch_dtype=torch.bfloat16,  # 使用bfloat16
+        # torch_dtype=torch.float16,
         device_map=device_map,
         resume_download=True,
     ).eval()
@@ -122,7 +120,7 @@ def _print_history(history):
     print(f"History ({len(history)})".center(terminal_width, "="))
     for index, (query, response) in enumerate(history):
         print(f"User[{index}]: {query}")
-        print(f"Qwen[{index}]: {response}")
+        print(f"MUST-Helper[{index}]: {response}")
     print("=" * terminal_width)
 
 
@@ -168,7 +166,7 @@ def _chat_stream(model, tokenizer, query, history):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Qwen2.5-Instruct command-line interactive chat demo."
+        description="MUST-Helper command-line interactive chat demo."
     )
     parser.add_argument(
         "-c",
@@ -183,14 +181,11 @@ def main():
     )
     args = parser.parse_args()
 
-    history, response = [], ""
-
     model, tokenizer = _load_model_tokenizer(args)
     orig_gen_config = deepcopy(model.generation_config)
 
     _setup_readline()
 
-    _clear_screen()
     print(_WELCOME_MSG)
 
     seed = args.seed
@@ -198,7 +193,7 @@ def main():
     while True:
         query = _get_input()
 
-        # Process commands.
+        # 处理命令
         if query.startswith(":"):
             command_words = query[1:].strip().split()
             if not command_words:
@@ -208,21 +203,8 @@ def main():
 
             if command in ["exit", "quit", "q"]:
                 break
-            elif command in ["clear", "cl"]:
-                _clear_screen()
-                print(_WELCOME_MSG)
-                _gc()
-                continue
-            elif command in ["clear-history", "clh"]:
-                print(f"[INFO] All {len(history)} history cleared")
-                history.clear()
-                _gc()
-                continue
             elif command in ["help", "h"]:
                 print(_HELP_MSG)
-                continue
-            elif command in ["history", "his"]:
-                _print_history(history)
                 continue
             elif command in ["seed"]:
                 if len(command_words) == 1:
@@ -264,33 +246,23 @@ def main():
                             )
                             setattr(model.generation_config, conf_key, conf_value)
                 continue
-            elif command in ["reset-conf"]:
-                print("[INFO] Reset generation config")
-                model.generation_config = deepcopy(orig_gen_config)
-                print(model.generation_config)
-                continue
             else:
-                # As normal query.
+                # 作为普通查询处理
                 pass
 
-        # Run chat.
+        # 运行对话
         set_seed(seed)
-        _clear_screen()
-        print(f"\nUser: {query}")
-        print(f"\nQwen: ", end="")
         try:
             partial_text = ""
-            for new_text in _chat_stream(model, tokenizer, query, history):
+            print("MUST-Helper: ", end="")  # 只输出 MUST-Helper 的回答
+            for new_text in _chat_stream(model, tokenizer, query, []):
                 print(new_text, end="", flush=True)
                 partial_text += new_text
-            response = partial_text
-            print()
-
+            print()  # 输出换行
         except KeyboardInterrupt:
             print("[WARNING] Generation interrupted")
             continue
 
-        history.append((query, response))
 
 
 if __name__ == "__main__":
