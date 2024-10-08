@@ -1,11 +1,8 @@
 # MUST-Helper
 
-MUST-Helper 是一个集成了多个接口与交互方式的模型工具，允许用户通过不同方式与微调的大模型进行交互。该工具支持 API、命令行以及 Web 界面的交互方式。
-
-## 权重文件
-[HuggingFace / ](https://www.google.com)
-[ 魔塔社区](https://www.google.com)
-链接待修改
+MUST-Helper is an integrated intelligent dialogue assistant developed by the Macau University of Science and Technology‘s student. It allows users to interact with fine-tuned models through various interfaces, including API, command-line, and web interface.
+## Weight file
+[ ModelScope ](https://modelscope.cn/models/limebradley/MUST-Helper)
 - added_tokens.json
 - config.json
 - generation_config.json
@@ -21,57 +18,56 @@ MUST-Helper 是一个集成了多个接口与交互方式的模型工具，允�
 - vocab.json
 ![CHECKPOINT](img/img3.png)
 
+## Repository structure
 
-## 仓库结构
+- **api.py**: Provide API through Flask and Gunicorn Interface, allowing remote users to call the fine-tuned large model.
+- **cli_demo.py**: Provides a command line interface, users can interact with the model directly through the command line.
+- **web_demo.py**: Uses Gradio to create a web interface, allowing users to interact with the model through a browser.
+- **requirements.txt**: A list of dependency packages required for the project.
 
-- **api.py**: 通过 Flask 和 Gunicorn 提供 API 接口，允许远程用户调用微调的大模型。
-- **cli_demo.py**: 提供命令行接口，用户可以直接通过命令行与模型进行交互。
-- **web_demo.py**: 使用 Gradio 创建了一个 Web 界面，允许用户通过浏览器与模型交互。
-- **requirements.txt**: 项目所需的依赖包列表。
+## Environment Setup
 
-## 环境设置
+First, make sure you have Python 3.8 or higher installed.
 
-首先，确保你已经安装了 Python 3.8 或更高版本。
+### Install dependencies
 
-### 安装依赖
-
-在项目根目录下运行以下命令来安装所需的依赖：
+Run the following command in the project root directory to install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 使用说明
+## Usage instructions
 
-### 通过 API 进行交互
-api.py 提供了一个基于 Flask 和 Gunicorn 的 RESTful API，可以通过以下方式启动：
+### Interact through the API
+api.py provides a RESTful API based on Flask and Gunicorn, which can be started as follows:
 
 ```bash
 gunicorn -w 1 -b 0.0.0.0:6006 api:app
 ```
-服务器启动后，API 将运行在 http://localhost:6006，你可以通过 curl 或其他工具来调用。
+After the server is started, the API will run at http://localhost:6006, and you can call it through curl or other tools.
 ![API](img/img1.png)
 
-### 通过命令行进行交互
-运行 cli_demo.py 以通过命令行与模型交互：
+### Interact through the command line
+Run cli_demo.py to interact with the model through the command line:
 
 ```bash
-python cli_demo.py 
+python cli_demo.py
 ```
-你可以根据自己的需要在命令行中添加不同的输入选项。
+You can add different input options in the command line according to your needs.
 
-###  通过 Web 界面进行交互
-运行 web_demo.py，启动基于 Gradio 的 Web 界面：
+### Interacting via the web interface
+Run web_demo.py to start the Gradio-based web interface:
 ```bash
 python web_demo.py
 ```
 ![WEB](img/img2.png)
 
-启动后，浏览器将自动打开 Gradio Web 应用，允许你通过图形界面与模型进行交互。
+Once started, your browser will automatically open the Gradio web application, allowing you to interact with the model through a graphical interface.
 
-## 贡献指南
-如果你有兴趣贡献代码，请 fork 本项目并提交 Pull Request，或者提交 Issue 与我们讨论新功能。
-Email：Bradley.xsq@gmail.com
+## Contribution Guide
+If you are interested in contributing code, please fork this project and submit a Pull Request, or submit an Issue to discuss new features with us.
+Email: Bradley.xsq@gmail.com
 
-## 许可证
-此项目遵循 MIT 许可证，详情请参考 LICENSE 文件。
+## License
+This project follows the MIT license, please refer to the LICENSE file for details.
